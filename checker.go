@@ -19,6 +19,21 @@ func newChecker() *checker {
 }
 
 func (c *checker) add(o *operation) {
+	// 检查图中是否已经存在相同的写操作
+	if o.input != nil && o.output == nil {
+		for v := range c.Graph.Vertices() {
+			if v.(*operation).input == o.input && v.(*operation).output == nil {
+				// 已经存在相同的写操作，更新时间区间
+				if v.(*operation).start > o.start {
+					v.(*operation).start = o.start
+				}
+				if v.(*operation).end < o.end {
+					v.(*operation).end = o.end
+				}
+				return
+			}
+		}
+	}
 	if c.Graph.Has(o) {
 		// already in graph from lookahead
 		return
