@@ -8,3 +8,5 @@ tla/*
 aws
 ppaxos
 cosmos
+history.csv
+latency
