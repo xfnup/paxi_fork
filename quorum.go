@@ -1,5 +1,6 @@
 package paxi
 
+// 这个代码定义了一个 Quorum 结构体及其相关方法，用于管理和检查不同类型的 quorum（法定人数）是否满足。
 // Quorum records each acknowledgement and check for different types of quorum satisfied
 type Quorum struct {
 	size  int

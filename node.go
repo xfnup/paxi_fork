@@ -1,5 +1,7 @@
 package paxi
 
+// 总的来说，这段代码实现了一个分布式系统中节点的基本功能，包括接收和处理客户端请求、转发请求、以及通过 HTTP 提供 RESTful API 服务。
+// 通过注册处理函数和启动节点，Node 可以接收、处理和转发请求，并通过 HTTP 提供 RESTful API 服务。
 import (
 	"net/http"
 	"reflect"
@@ -8,6 +10,7 @@ import (
 	"github.com/ailidani/paxi/log"
 )
 
+// Node 接口定义了每个节点必须实现的方法。它继承了 Socket 和 Database 接口，并添加了一些节点特有的方法。
 // Node is the primary access point for every replica
 // it includes networking, state machine and RESTful API server
 type Node interface {
@@ -20,6 +23,7 @@ type Node interface {
 	Register(m interface{}, f interface{})
 }
 
+// node 结构体实现了Node接口操作并提供了具体的实现细节。
 // node implements Node interface
 type node struct {
 	id ID

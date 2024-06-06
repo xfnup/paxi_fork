@@ -1,5 +1,6 @@
 package paxi
 
+// 这段代码实现了一个操作历史记录管理系统，包含添加操作记录、检查线性一致性和读写文件等功能
 import (
 	"bufio"
 	"encoding/csv"

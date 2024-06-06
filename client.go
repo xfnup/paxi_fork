@@ -1,5 +1,7 @@
 package paxi
 
+// 这段代码实现了 Paxos 分布式一致性系统的客户端。它使用提供的服务器地址（Addrs 和 HTTP）通过 HTTP 与 Paxos 服务器进行通信。
+// 此代码提供了一个用于与 Paxos 系统交互的客户端库。它允许您获取和放置键值对，执行一致性检查以及模拟故障以进行测试。
 import (
 	"bytes"
 	"encoding/json"

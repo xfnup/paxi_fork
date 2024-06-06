@@ -1,5 +1,6 @@
 package paxi
 
+// 这段代码提供了一种结构化的方式来表示和管理带有区域和节点信息的 Paxos 节点标识符。
 import (
 	"strconv"
 	"strings"

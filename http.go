@@ -1,5 +1,6 @@
 package paxi
 
+// 这段代码实现了一个 HTTP 服务器，提供了一些 API 接口来处理客户端请求，如处理命令、获取历史记录、模拟节点崩溃和消息丢弃。
 import (
 	"encoding/json"
 	"io"
