@@ -1,5 +1,6 @@
 package paxi
 
+// 这个 Go 代码实现了一个名为 Socket 的接口以及它的一个具体实现socket，用于在分布式系统中处理节点之间的消息传递和故障注入（如丢包、延迟、概率性丢包和崩溃模拟）。
 import (
 	"math/rand"
 	"sync"
@@ -36,14 +37,13 @@ type Socket interface {
 }
 
 type socket struct {
-	id        ID
-	addresses map[ID]string
-	nodes     map[ID]Transport
-
-	crash bool
-	drop  map[ID]bool
-	slow  map[ID]int
-	flaky map[ID]float64
+	id        ID               // 当前节点的 ID
+	addresses map[ID]string    // 所有节点的地址
+	nodes     map[ID]Transport // 与其他节点的传输连接
+	crash     bool             // 当前节点是否崩溃
+	drop      map[ID]bool      // 是否丢弃特定节点的消息
+	slow      map[ID]int       // 延迟特定节点的消息
+	flaky     map[ID]float64   // 概率性丢包
 
 	lock sync.RWMutex // locking map nodes
 }

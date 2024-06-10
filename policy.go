@@ -1,5 +1,7 @@
 package paxi
 
+// 这段代码通过实现 Policy 接口的多种策略（如 consecutive、majority、ema 和 null），提供了不同的数据访问模式检测方法。
+// 这些策略可以用于数据迁移协议中，根据不同的访问模式触发相应的操作。
 import (
 	"math"
 	"time"

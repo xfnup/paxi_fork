@@ -1,5 +1,6 @@
 package paxi
 
+// 这段代码定义了一个传输层接口和具体的传输实现，包括TCP、UDP和进程内通信（channels）。
 import (
 	"bytes"
 	"encoding/gob"
@@ -13,6 +14,7 @@ import (
 	"github.com/ailidani/paxi/log"
 )
 
+// 从命令行获取配置参数
 var scheme = flag.String("transport", "tcp", "transport scheme (tcp, udp, chan), default tcp")
 
 // Transport = transport + pipe + client + server
@@ -36,6 +38,7 @@ type Transport interface {
 	Close()
 }
 
+// 根据给定的地址创建一个新的传输对象。它支持不同的传输方案，如 tcp、udp 和 chan
 // NewTransport creates new transport object with url
 func NewTransport(addr string) Transport {
 	if !strings.Contains(addr, "://") {
@@ -72,6 +75,8 @@ func NewTransport(addr string) Transport {
 	return nil
 }
 
+// transport 结构体及其方法提供了基础的网络传输功能。通过 Send 方法发送消息，通过 Recv 方法接收消息，通过 Close 方法关闭传输.
+// Dial 方法用于建立与远程服务器的 TCP 连接，并在后台 goroutine 中处理消息发送。整个实现使用了 gob 编码器对消息进行编码，从而支持任意类型的消息传输。
 type transport struct {
 	uri   *url.URL
 	send  chan interface{}
@@ -118,9 +123,11 @@ func (t *transport) Dial() error {
 	return nil
 }
 
-/******************************
+/*
+*****************************
 /*     TCP communication      *
-/******************************/
+/*****************************
+*/
 type tcp struct {
 	*transport
 }
@@ -166,9 +173,11 @@ func (t *tcp) Listen() {
 	}(listener)
 }
 
-/******************************
+/*
+*****************************
 /*     UDP communication      *
-/******************************/
+/*****************************
+*/
 type udp struct {
 	*transport
 }
