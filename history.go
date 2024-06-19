@@ -16,9 +16,9 @@ import (
 
 // History client operation history mapped by key
 type History struct {
-	sync.RWMutex
-	shard      map[int][]*operation
-	operations []*operation
+	sync.RWMutex // 结构体嵌入了 sync.RWMutex，这表示 History 具备读写互斥锁的功能，可以保护它的数据结构免受并发读写的冲突影响。
+	shard        map[int][]*operation
+	operations   []*operation
 }
 
 // NewHistory creates a History map

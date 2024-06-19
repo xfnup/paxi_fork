@@ -46,7 +46,7 @@ func (d *db) Write(k, v int) error {
 }
 
 func main() {
-	paxi.Init()
+	paxi.Init() //读取config.json
 
 	if *master != "" {
 		paxi.ConnectToMaster(*master, true, paxi.ID(*id))

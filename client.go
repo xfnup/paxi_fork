@@ -101,6 +101,7 @@ func (c *HTTPClient) GetURL(id ID, key Key) string {
 	return c.HTTP[id] + "/" + strconv.Itoa(int(key))
 }
 
+// 实现了http的get和put操作
 // rest accesses server's REST API with url = http://ip:port/key
 // if value == nil, it's a read
 func (c *HTTPClient) rest(id ID, key Key, value Value) (Value, map[string]string, error) {
