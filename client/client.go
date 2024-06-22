@@ -16,7 +16,7 @@ var master = flag.String("master", "", "Master address.")
 
 // db implements Paxi.DB interface for benchmarking
 type db struct {
-	paxi.Client
+	paxi.Client // client接口，赋值为任意client结构体后,结构体db可以直接使用接口Client的方法
 }
 
 func (d *db) Init() error {

@@ -59,6 +59,7 @@ func (n *node) Retry(r Request) {
 	n.MessageChan <- r
 }
 
+// 为每种消息类型注册一个处理函数。使用反射机制检查传入的处理函数是否符合预期的签名，并将其存储在node的handles字段中
 // Register a handle function for each message type
 func (n *node) Register(m interface{}, f interface{}) {
 	t := reflect.TypeOf(m)
@@ -69,6 +70,7 @@ func (n *node) Register(m interface{}, f interface{}) {
 	n.handles[t.String()] = fn
 }
 
+// 启动replica
 // Run start and run the node
 func (n *node) Run() {
 	log.Infof("node %v start running", n.id)
@@ -76,7 +78,7 @@ func (n *node) Run() {
 		go n.handle()
 		go n.recv()
 	}
-	n.http()
+	n.http() // 启动HTTP服务器
 }
 
 // recv receives messages from socket and pass to message channel
@@ -85,36 +87,37 @@ func (n *node) recv() {
 		m := n.Recv()
 		switch m := m.(type) {
 		case Request:
-			m.c = make(chan Reply, 1)
-			go func(r Request) {
-				n.Send(r.NodeID, <-r.c)
-			}(m)
-			n.MessageChan <- m
+			m.c = make(chan Reply, 1) // 为 Request 类型的消息创建一个缓冲区大小为1的 chan Reply，用于接收回复。
+			go func(r Request) {      // func(r Request) 是一个匿名函数，接受一个 Request 类型的参数 r
+				n.Send(r.NodeID, <-r.c) // 等待 m.c 中的值并将其发送到 r.NodeID。这个 goroutine 会一直阻塞，直到 m.c 接收到 Reply 类型的消息。
+			}(m) // 调用匿名函数并传递 m 作为参数。
+			n.MessageChan <- m // 写入通道中，让其他函数处理该请求
 			continue
 
 		case Reply:
 			n.RLock()
-			r := n.forwards[m.Command.String()]
+			r := n.forwards[m.Command.String()] // 应该是之前的请求的回复，所以可以找到原始请求
 			log.Debugf("node %v received reply %v", n.id, m)
 			n.RUnlock()
-			r.Reply(m)
+			r.Reply(m) // 请求的reply函数
 			continue
 		}
 		n.MessageChan <- m
 	}
 }
 
+// 通过反射机制处理从 MessageChan 接收到的消息
 // handle receives messages from message channel and calls handle function using refection
 func (n *node) handle() {
 	for {
 		msg := <-n.MessageChan
 		v := reflect.ValueOf(msg)
 		name := v.Type().String()
-		f, exists := n.handles[name]
+		f, exists := n.handles[name] // 找到处理函数
 		if !exists {
 			log.Fatalf("no registered handle function for message type %v", name)
 		}
-		f.Call([]reflect.Value{v})
+		f.Call([]reflect.Value{v}) // 使用反射机制调用 f 函数
 	}
 }
 
@@ -170,7 +173,7 @@ func (n *node) Forward(id ID, m Request) {
 	log.Debugf("Node %v forwarding %v to %s", n.ID(), m, id)
 	m.NodeID = n.id
 	n.Lock()
-	n.forwards[m.Command.String()] = &m
+	n.forwards[m.Command.String()] = &m // 记录请求，recv函数收到reply时找到对应请求
 	n.Unlock()
 	n.Send(id, m)
 }

@@ -61,7 +61,7 @@ func (r *Replica) handleRequest(m paxi.Request) {
 	if *ephemeralLeader || r.Paxos.IsLeader() || r.Paxos.Ballot() == 0 {
 		r.Paxos.HandleRequest(m)
 	} else {
-		go r.Forward(r.Paxos.Leader(), m)
+		go r.Forward(r.Paxos.Leader(), m) // follower将请求转发给leader处理
 	}
 }
 

@@ -24,7 +24,7 @@ const (
 // serve serves the http REST API request from clients
 func (n *node) http() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", n.handleRoot)
+	mux.HandleFunc("/", n.handleRoot) // 将不同的URL路径与对应的处理函数进行关联
 	mux.HandleFunc("/history", n.handleHistory)
 	mux.HandleFunc("/crash", n.handleCrash)
 	mux.HandleFunc("/drop", n.handleDrop)
