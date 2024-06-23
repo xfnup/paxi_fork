@@ -86,7 +86,7 @@ func (n *node) recv() {
 	for {
 		m := n.Recv()
 		switch m := m.(type) {
-		case Request:
+		case Request: // 若是请求就将其交给相应的处理函数，并将回复写到请求的一个通道属性后，发送回请求源地址
 			m.c = make(chan Reply, 1) // 为 Request 类型的消息创建一个缓冲区大小为1的 chan Reply，用于接收回复。
 			go func(r Request) {      // func(r Request) 是一个匿名函数，接受一个 Request 类型的参数 r
 				n.Send(r.NodeID, <-r.c) // 等待 m.c 中的值并将其发送到 r.NodeID。这个 goroutine 会一直阻塞，直到 m.c 接收到 Reply 类型的消息。
