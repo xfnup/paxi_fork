@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -46,6 +47,18 @@ func (n *node) handleRoot(w http.ResponseWriter, r *http.Request) {
 	var req Request
 	var cmd Command
 	var err error
+
+	// 获取客户端的 IP 地址和端口号
+	clientAddr := r.RemoteAddr
+
+	// 将 clientAddr 解析为 IP 地址和端口号
+	clientIP, clientPort, err := net.SplitHostPort(clientAddr)
+	if err != nil {
+		log.Error("error splitting host and port: ", err)
+		http.Error(w, "invalid client address", http.StatusBadRequest)
+		return
+	}
+	log.Debugf("Client IP: %s, Client Port: %s", clientIP, clientPort)
 
 	// get all http headers
 	req.Properties = make(map[string]string)
@@ -105,6 +118,30 @@ func (n *node) handleRoot(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, reply.Err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// 使用 UDP 向客户端发送消息
+	go func() {
+		// 构造客户端的地址
+		clientUDPAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(clientIP, string("12345")))
+		if err != nil {
+			log.Error("error resolving UDP address: ", err)
+			return
+		}
+
+		// 创建一个 UDP 连接
+		conn, err := net.DialUDP("udp", nil, clientUDPAddr)
+		if err != nil {
+			log.Error("error dialing UDP: ", err)
+			return
+		}
+		defer conn.Close()
+
+		// 将 reply.Value 转换为字节并发送
+		_, err = conn.Write(reply.Command.Value)
+		if err != nil {
+			log.Error("error sending UDP message: ", err)
+		}
+	}()
 
 	// set all http headers
 	w.Header().Set(HTTPClientID, string(reply.Command.ClientID))
