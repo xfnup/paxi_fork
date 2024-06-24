@@ -123,7 +123,7 @@ func (c *HTTPClient) rest(id ID, key Key, value Value) (Value, map[string]string
 	req.Header.Set(HTTPCommandID, strconv.Itoa(c.CID))
 	// r.Header.Set(HTTPTimestamp, strconv.FormatInt(time.Now().UnixNano(), 10))
 
-	rep, err := c.Client.Do(req)
+	rep, err := c.Client.Do(req) // 发送请求并接收响应
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err

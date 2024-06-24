@@ -90,6 +90,7 @@ func (n *node) recv() {
 			m.c = make(chan Reply, 1) // 为 Request 类型的消息创建一个缓冲区大小为1的 chan Reply，用于接收回复。
 			go func(r Request) {      // func(r Request) 是一个匿名函数，接受一个 Request 类型的参数 r
 				n.Send(r.NodeID, <-r.c) // 等待 m.c 中的值并将其发送到 r.NodeID。这个 goroutine 会一直阻塞，直到 m.c 接收到 Reply 类型的消息。
+				// 一旦接收到值，n.Send(r.NodeID, <-r.c) 调用 Send 方法，将接收到的 Reply 发送到 r.NodeID 节点。
 			}(m) // 调用匿名函数并传递 m 作为参数。
 			n.MessageChan <- m // 写入通道中，让其他函数处理该请求
 			continue

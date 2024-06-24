@@ -102,18 +102,18 @@ func (t *transport) Scheme() string {
 }
 
 func (t *transport) Dial() error {
-	conn, err := net.Dial(t.Scheme(), t.uri.Host)
+	conn, err := net.Dial(t.Scheme(), t.uri.Host) // 使用 net.Dial 函数尝试建立到远程服务器的连接。
 	if err != nil {
 		return err
 	}
 
-	go func(conn net.Conn) {
+	go func(conn net.Conn) { // 启动一个新的 goroutine 来处理连接
 		// w := bufio.NewWriter(conn)
 		// codec := NewCodec(config.Codec, conn)
 		encoder := gob.NewEncoder(conn)
 		defer conn.Close()
 		for m := range t.send {
-			err := encoder.Encode(&m)
+			err := encoder.Encode(&m) // 将消息编码为 gob 格式并发送到远程服务器
 			if err != nil {
 				log.Error(err)
 			}
@@ -134,23 +134,23 @@ type tcp struct {
 
 func (t *tcp) Listen() {
 	log.Debug("start listening ", t.uri.Port())
-	listener, err := net.Listen("tcp", ":"+t.uri.Port())
+	listener, err := net.Listen("tcp", ":"+t.uri.Port()) // 启动一个 TCP 监听器
 	if err != nil {
 		log.Fatal("TCP Listener error: ", err)
 	}
 
-	go func(listener net.Listener) {
+	go func(listener net.Listener) { // 启动一个新的 goroutine 来运行监听器。
 		defer listener.Close()
 		for {
-			conn, err := listener.Accept()
+			conn, err := listener.Accept() // 监听器发现新连接
 			if err != nil {
 				log.Error("TCP Accept error: ", err)
 				continue
 			}
 
-			go func(conn net.Conn) {
+			go func(conn net.Conn) { // 启动一个新的goroutine来处理新连接
 				// codec := NewCodec(config.Codec, conn)
-				decoder := gob.NewDecoder(conn)
+				decoder := gob.NewDecoder(conn) // 为连接创建一个解码器
 				defer conn.Close()
 				//r := bufio.NewReader(conn)
 				for {
@@ -159,12 +159,12 @@ func (t *tcp) Listen() {
 						return
 					default:
 						var m interface{}
-						err := decoder.Decode(&m)
+						err := decoder.Decode(&m) // 解码收到的消息
 						if err != nil {
 							log.Error(err)
 							continue
 						}
-						t.recv <- m
+						t.recv <- m // 将解码后的数据发送到recv通道
 					}
 				}
 			}(conn)
