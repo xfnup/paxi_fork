@@ -63,18 +63,12 @@ func main() {
 	}
 
 	b := paxi.NewBenchmark(d)
-	// b.T = 3
-	// b.Concurrency = 1
+	b.W = 0
+	b.T = 15
+	b.Concurrency = 1
 	if *load {
 		b.Load()
 	} else {
 		b.Run()
 	}
-	// tb := paxi.NewBenchmark(d)
-	// if *load {
-	// 	tb.Load()
-	// } else {
-	// 	tb.Run()
-	// }
-
 }
